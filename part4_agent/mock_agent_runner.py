@@ -30,19 +30,18 @@ def numbers_are_valid(
     current_revenue: float,
     mom_pct: float,
 ) -> bool:
-
     numbers = re.findall(
         r"-?\d+(?:\.\d+)?",
         message.replace(",", "")
     )
 
     allowed = {
-        str(previous_revenue),
-        str(current_revenue),
-        str(mom_pct),
+        round(previous_revenue, 2),
+        round(current_revenue, 2),
+        round(mom_pct, 2),
     }
 
-    return all(number in allowed for number in numbers)
+    return all(round(float(number), 2) in allowed for number in numbers)
 
 
 PREVIOUS_MONTH = {
@@ -175,4 +174,4 @@ if __name__ == "__main__":
         "part2_engine/fixtures/monthly_category_revenue.csv",
     )
 
-    print(json.dumps(result, indent=2, ensure_ascii=False))
+    print(json.dumps(result, indent=2))

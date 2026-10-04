@@ -123,3 +123,40 @@ def test_exact_boundary(tmp_path):
     assert result["flagged_categories"] == []
     assert result["suppressed_categories"] == []
     assert result["action_taken"] == "drafted_and_held_for_approval"
+
+def test_drafted_message_content():
+    result = run(
+        "May",
+        "part2_engine/fixtures/monthly_category_revenue.csv",
+        "part2_engine/fixtures/monthly_category_revenue.csv",
+    )
+
+    for item in result["flagged_categories"]:
+        assert item["drafted"] is True
+        assert item["category"] in item["message"]
+        assert str(item["mom_pct"]) in item["message"]
+
+def test_numbers_are_valid_rejects_invented_number():
+    from part4_agent.mock_agent_runner import numbers_are_valid
+
+    message = "Revenue changed from 100000.00 to 108000.00, with a MoM change of 8.0%."
+
+    assert numbers_are_valid(message, 100000.0, 108000.0, 8.0)
+    assert not numbers_are_valid(
+        message + " Extra figure: 99999",
+        100000.0,
+        108000.0,
+        8.0,
+    )
+
+def test_numbers_are_valid_trailing_zero():
+    from part4_agent.mock_agent_runner import numbers_are_valid
+
+    message = "Revenue changed from ₹100,000.00 to ₹108,000.00, with a MoM change of 8.0%."
+
+    assert numbers_are_valid(
+        message,
+        100000.00,
+        108000.00,
+        8.0,
+    )
